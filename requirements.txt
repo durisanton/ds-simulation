@@ -1,0 +1,4 @@
+matplotlib
+numpy
+PyQt5==5.15.6
+git+https://github.com/durisanton/petnetsim.git
