@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Union
 
-from petnetsim import PetriNet, Place, Transition, Arc
+from petnetsim import PetriNet, Place, Transition, Arc, TransitionStochastic, TransitionTimed
 
-from simulation.utils.constants import Constants
 from simulation.nets.default_net import DefaultNet
+from simulation.utils.constants import Constants
 
 
 @dataclass
@@ -23,37 +23,15 @@ class TaskDistributionNet(DefaultNet):
         for client_i in range(1, self.params.clients + 1):
             # filling probability and time data to transitions
             for tr in self.client_net.transitions:
-                if tr.name == 'connect':
-                    tr.t_min = self.params.connect_min_time[client_i - 1]
-                    tr.t_max = self.params.connect_max_time[client_i - 1]
-                if tr.name == 'pc_initialization':
-                    tr.t_min = self.params.pc_initialization_min_time[client_i - 1]
-                    tr.t_max = self.params.pc_initialization_max_time[client_i - 1]
-                if tr.name == 'client_running':
-                    tr.probability = self.params.client_running_probability[client_i - 1]
-                if tr.name == 'client_crash':
-                    tr.probability = self.params.client_crash_probability[client_i - 1]
-                if tr.name == 'compute_1':
-                    tr.t_min = self.params.compute_1_min_time[client_i - 1]
-                    tr.t_max = self.params.compute_1_max_time[client_i - 1]
-                if tr.name == 'pause_off':
-                    tr.probability = self.params.pause_off_probability[client_i - 1]
-                if tr.name == 'pause_on':
-                    tr.probability = self.params.pause_on_probability[client_i - 1]
-                if tr.name == 'in_pause':
-                    tr.t_min = self.params.in_pause_min_time[client_i - 1]
-                    tr.t_max = self.params.in_pause_max_time[client_i - 1]
-                if tr.name == 'job_running':
-                    tr.probability = self.params.job_running_probability[client_i - 1]
-                if tr.name == 'job_crash':
-                    tr.probability = self.params.job_crash_probability[client_i - 1]
-                if tr.name == 'compute_2':
-                    tr.t_min = self.params.compute_2_min_time[client_i - 1]
-                    tr.t_max = self.params.compute_2_max_time[client_i - 1]
-                if tr.name == 'correct':
-                    tr.probability = self.params.correct_probability[client_i - 1]
-                if tr.name == 'incorrect':
-                    tr.probability = self.params.incorrect_probability[client_i - 1]
+                if isinstance(tr, TransitionTimed):
+                    tr_to_params_mapping: Union[tuple[list], tuple[list, list]] = self._get_mapping(
+                        tr_name=tr.name)
+                    tr.t_min = tr_to_params_mapping[0][client_i - 1]
+                    tr.t_max = tr_to_params_mapping[1][client_i - 1]
+                elif isinstance(tr, TransitionStochastic):
+                    tr_to_params_mapping: Union[tuple[list], tuple[list, list]] = self._get_mapping(
+                        tr_name=tr.name)
+                    tr.probability = tr_to_params_mapping[0][client_i - 1]
 
             prefix: str = self._make_prefix(client_id=client_i)
 
@@ -69,3 +47,20 @@ class TaskDistributionNet(DefaultNet):
     @staticmethod
     def _make_prefix(client_id: int) -> str:
         return f'client{str(client_id)}_'
+
+    def _get_mapping(self, tr_name: str) -> Union[tuple[list], tuple[list, list]]:
+        return {
+            'connect': (self.params.connect_min_time, self.params.connect_max_time),
+            'pc_initialization': (self.params.pc_initialization_min_time, self.params.pc_initialization_max_time),
+            'client_running': (self.params.client_running_probability,),
+            'client_crash': (self.params.client_crash_probability,),
+            'compute_1': (self.params.compute_1_min_time, self.params.compute_1_max_time),
+            'pause_off': (self.params.pause_off_probability,),
+            'pause_on': (self.params.pause_on_probability,),
+            'in_pause': (self.params.in_pause_min_time, self.params.in_pause_max_time),
+            'job_running': (self.params.job_running_probability,),
+            'job_crash': (self.params.job_crash_probability,),
+            'compute_2': (self.params.compute_2_min_time, self.params.compute_2_max_time),
+            'correct': (self.params.correct_probability,),
+            'incorrect': (self.params.incorrect_probability,),
+        }[tr_name]

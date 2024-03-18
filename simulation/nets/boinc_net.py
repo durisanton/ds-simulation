@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from petnetsim import Transition, Place, Arc, PetriNet
 
@@ -9,7 +9,7 @@ from simulation.nets.task_distribution_net import TaskDistributionNet
 
 @dataclass
 class BoincNet(DefaultNet):
-    task_net: PetriNet = None
+    task_net: Optional[PetriNet] = None
     # place 'project' is a starting place for each task; place 'project_computed' is merging point for all task
     # results
     places: List[Place] = field(default_factory=lambda: [Place(name='project', init_tokens=1),
@@ -21,7 +21,7 @@ class BoincNet(DefaultNet):
     def _make_task_net(self) -> None:
         self.task_net: PetriNet = TaskDistributionNet(params=self.params).make_net()
 
-    def _clone_jobs(self):
+    def _clone_jobs(self) -> None:
         self._make_task_net()
         # cloning job tasks
         for task_i in range(1, self.params.tasks + 1):
