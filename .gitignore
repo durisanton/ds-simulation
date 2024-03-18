@@ -1,0 +1,4 @@
+petnetsim.egg-info
+.idea
+db.sqlite3
+__pycache__
