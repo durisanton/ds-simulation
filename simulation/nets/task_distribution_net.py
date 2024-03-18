@@ -3,8 +3,8 @@ from typing import List
 
 from petnetsim import PetriNet, Place, Transition, Arc
 
-from constants import Constants
-from nets.default_net import DefaultNet
+from simulation.utils.constants import Constants
+from simulation.nets.default_net import DefaultNet
 
 
 @dataclass
