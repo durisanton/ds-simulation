@@ -1,4 +1,3 @@
-import json
 import statistics
 from typing import Optional
 
@@ -11,29 +10,22 @@ from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
 from petnetsim import PetriNet
 
+from simulation.models import Params
 from simulation.nets.boinc_net import BoincNet
 from simulation.utils.constants import Constants
-from simulation.utils.params import NetParams
 
 
 class BoincSimulation:
     def __init__(self):
         self.boinc_net: Optional[PetriNet] = None
-        self.params: Optional[NetParams] = None
+        self.params: Params = Params.init()
         self.place_tokens: dict[str: list[int]] = dict()
         self.place_time: dict[str: float] = dict()
         self.time_computed: list[float] = list()
         self.stats: dict[str: dict[str: int]] = dict()
         self.time: dict[int: list[float]] = dict()
 
-    @staticmethod
-    def load_params() -> NetParams:
-        with open(file='simulation/utils/params.json') as file:
-            params = NetParams.from_dict(json.load(file))
-        return params
-
     def make_net(self) -> None:
-        self.params: NetParams = self.load_params()
         self.boinc_net: PetriNet = BoincNet(params=self.params).make_net()
 
     # one run of simulation

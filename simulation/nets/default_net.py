@@ -3,7 +3,7 @@ from typing import List, Union
 
 from petnetsim import PetriNet, Place, Transition, Arc, TransitionTimed, TransitionStochastic
 
-from simulation.utils.params import NetParams
+from simulation.models import Params
 
 
 @dataclass
@@ -11,7 +11,7 @@ class DefaultNet:
     """
         default class for making petri nets
     """
-    params: NetParams = field(default_factory=dataclass)
+    params: Params = field(default_factory=dataclass)
     places: List[Place] = field(default_factory=list)
     arcs: List[Arc] = field(default_factory=list)
     transitions: List[Union[Transition, TransitionTimed, TransitionStochastic]] = field(default_factory=list)

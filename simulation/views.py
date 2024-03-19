@@ -1,5 +1,10 @@
+import json
+from typing import Union
+
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from matplotlib.figure import Figure
 
 from simulation.boinc import BoincSimulation
@@ -34,4 +39,12 @@ def plot_gant(request):
 
 
 def params(request):
-    return JsonResponse(sim.params.to_dict(), safe=False, json_dumps_params={'indent': 2})
+    return JsonResponse(model_to_dict(sim.params), safe=False, json_dumps_params={'indent': 2})
+
+
+@csrf_exempt
+def change_params(request):
+    if request.method == "POST":
+        data: dict[str: Union[int, list[int]]] = json.loads(request.body)
+        sim.params.update(**data)
+        return JsonResponse(data)

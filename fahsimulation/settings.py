@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'fahsimulation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fahsimualtion',
+        'NAME': 'fahsimulation',
         'USER': 'anton',
         'PASSWORD': 'password',
         'HOST': '127.0.0.1',
