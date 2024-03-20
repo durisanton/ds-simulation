@@ -41,7 +41,7 @@ class Params(Model):
 
     @staticmethod
     def load_params() -> dict:
-        with open(file='simulation/fixtures/params.json') as file:
+        with open(file='fah-simulation/fixtures/params.json') as file:
             params_dict = json.load(file)
         return params_dict
 
