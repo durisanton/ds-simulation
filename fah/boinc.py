@@ -10,9 +10,9 @@ from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
 from petnetsim import PetriNet
 
-from simulation.models import Params
-from simulation.nets.boinc_net import BoincNet
-from simulation.utils.constants import Constants
+from fah.models import Params
+from fah.nets.boinc_net import BoincNet
+from fah.utils.constants import Constants
 
 
 class BoincSimulation:

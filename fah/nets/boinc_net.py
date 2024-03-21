@@ -3,8 +3,8 @@ from typing import List, Optional
 
 from petnetsim import Transition, Place, Arc, PetriNet
 
-from simulation.nets.default_net import DefaultNet
-from simulation.nets.task_distribution_net import TaskDistributionNet
+from fah.nets.default_net import DefaultNet
+from fah.nets.task_distribution_net import TaskDistributionNet
 
 
 @dataclass

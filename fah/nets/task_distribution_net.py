@@ -3,8 +3,8 @@ from typing import List, Union
 
 from petnetsim import PetriNet, Place, Transition, Arc, TransitionStochastic, TransitionTimed
 
-from simulation.nets.default_net import DefaultNet
-from simulation.utils.constants import Constants
+from fah.nets.default_net import DefaultNet
+from fah.utils.constants import Constants
 
 
 @dataclass

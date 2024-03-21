@@ -3,7 +3,7 @@ from typing import List, Union
 
 from petnetsim import PetriNet, Place, Transition, Arc, TransitionTimed, TransitionStochastic
 
-from simulation.models import Params
+from fah.models import Params
 
 
 @dataclass

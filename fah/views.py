@@ -7,8 +7,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from matplotlib.figure import Figure
 
-from simulation.boinc import BoincSimulation
-from simulation.utils.utils import Utils
+from fah.boinc import BoincSimulation
+from fah.utils.utils import Utils
 
 sim = BoincSimulation()
 sim.make_net()
