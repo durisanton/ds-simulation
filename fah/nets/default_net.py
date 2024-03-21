@@ -6,6 +6,10 @@ from petnetsim import PetriNet, Place, Transition, Arc, TransitionTimed, Transit
 from fah.models import Params
 
 
+class DefaultNetException(Exception):
+    pass
+
+
 @dataclass
 class DefaultNet:
     """
@@ -17,4 +21,7 @@ class DefaultNet:
     transitions: List[Union[Transition, TransitionTimed, TransitionStochastic]] = field(default_factory=list)
 
     def make_net(self) -> PetriNet:
-        return PetriNet(self.places, self.transitions, self.arcs)
+        try:
+            return PetriNet(self.places, self.transitions, self.arcs)
+        except Exception:
+            raise DefaultNetException(f'Base net creation error. \nCheck net params: {self.params.__dict__}')

@@ -25,13 +25,14 @@ class BoincSimulation:
         self.stats: dict[str: dict[str: int]] = dict()
         self.time: dict[int: list[float]] = dict()
 
-    def make_net(self) -> None:
-        self.boinc_net: PetriNet = BoincNet(params=self.params).make_net()
+    def make_net(self) -> bool:
+        self.boinc_net = BoincNet(params=self.params).make_net()
+        if self.boinc_net is None:
+            return False
+        return True
 
     # one run of simulation
     def single_run(self) -> None:
-        if self.boinc_net.ended:
-            self.make_net()
         # main loop
         while not self.boinc_net.ended and self.boinc_net.step_num < self.params.max_steps:
             self.boinc_net.step()
@@ -81,12 +82,14 @@ class BoincSimulation:
 
     # for plotting deadline stats
     def plot_deadline(self) -> Figure:
+        fig, axs = plt.subplots(nrows=1, ncols=1, facecolor='w', edgecolor='k', sharex=True)
+        if not self.make_net():
+            return fig
         self.deadline_simulation()
         mean: list[float] = [statistics.mean(self.time[i]) for i in range(self.params.stats_loops)]
         std: list[float] = [statistics.stdev(self.time[i]) for i in range(self.params.stats_loops)]
         ind: list[int] = [i for i in range(self.params.stats_loops)]
         # plot requests for each microservice
-        fig, axs = plt.subplots(nrows=1, ncols=1, facecolor='w', edgecolor='k', sharex=True)
         fig.subplots_adjust(hspace=.5, wspace=.1)
         fig.suptitle(t='Duration of project computation', fontsize=16)
         axs.bar(x=ind, height=mean, width=.1, yerr=np.array(std), label='time')
@@ -101,12 +104,14 @@ class BoincSimulation:
 
     # plot deadline; job pause method
     def plot_pause_deadline(self):
+        fig, axs = plt.subplots(nrows=1, ncols=1, facecolor='w', edgecolor='k', sharex=True)
+        if not self.make_net():
+            return fig
         self.pause_simulation()
         mean: list[float] = [statistics.mean(self.time[i]) for i in range(self.params.stats_loops)]
         std: list[float] = [statistics.stdev(self.time[i]) for i in range(self.params.stats_loops)]
         ind: list[int] = [i for i in range(self.params.stats_loops)]
         # plot requests for each microservice
-        fig, axs = plt.subplots(nrows=1, ncols=1, facecolor='w', edgecolor='k', sharex=True)
         fig.subplots_adjust(hspace=.5, wspace=.1)
         fig.suptitle(t='Duration of project computation', fontsize=16)
         axs.bar(x=ind, height=mean, width=.1, yerr=np.array(std), label='time')
@@ -119,10 +124,12 @@ class BoincSimulation:
         return fig
 
     def plot_stats(self) -> Figure:
+        fig, axs = plt.subplots(nrows=1, ncols=1, facecolor='w', edgecolor='k', sharex=True)
+        if not self.make_net():
+            return fig
         ind: list[int] = [i + 1 for i in range(self.params.loops)]
         time: list[float] = [self.stats[f'loop_{loop}']['time'] for loop in range(1, self.params.loops + 1)]
         # plot requests for each microservice
-        fig, axs = plt.subplots(nrows=1, ncols=1, facecolor='w', edgecolor='k', sharex=True)
         fig.subplots_adjust(hspace=.5, wspace=.1)
         fig.suptitle(t='Duration of project computation', fontsize=16)
         axs.bar(x=ind, height=time, width=.1, label='time')
@@ -135,8 +142,10 @@ class BoincSimulation:
         """
             gant plot of basic setup of nets
         """
-        self.single_run()
         fig: Figure = plt.figure(figsize=(20, 8))
+        if not self.make_net():
+            return fig
+        self.single_run()
         ax: Axes = fig.add_subplot(111)
         fig.suptitle(t='Number of results for individual tasks', fontsize=16)
         for i in range(1, self.params.tasks + 1):

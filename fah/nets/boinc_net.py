@@ -1,10 +1,18 @@
+import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
 
 from petnetsim import Transition, Place, Arc, PetriNet
 
-from fah.nets.default_net import DefaultNet
-from fah.nets.task_distribution_net import TaskDistributionNet
+from fah.nets.default_net import DefaultNet, DefaultNetException
+from fah.nets.task_distribution_net import TaskDistributionNet, TaskDistributionNetException
+
+LOG = logging.getLogger(__name__)
+logging.basicConfig(filename='example.log', encoding='utf-8')
+
+
+class NetCreationException(Exception):
+    pass
 
 
 @dataclass
@@ -30,11 +38,22 @@ class BoincNet(DefaultNet):
             self.places.append(Place(f'task{task_i}'))
             self.arcs.append(Arc(source=f'task{task_i}', target=f'{prefix}distribution'))
             self.arcs.append(Arc(source='make_tasks', target=f'task{task_i}'))
-            self.arcs.append(Arc(source=f'{prefix}results', target='merge_tasks', n_tokens=self.params.compare_results))
+            self.arcs.append(Arc(source=f'{prefix}results', target='merge_tasks',
+                                 n_tokens=self.params.compare_results))
 
-    def make_net(self) -> PetriNet:
-        self._clone_jobs()
-        return PetriNet(self.places, self.transitions, self.arcs)
+    def make_net(self) -> Optional[PetriNet]:
+        try:
+            self._clone_jobs()
+            return PetriNet(self.places, self.transitions, self.arcs)
+        except DefaultNetException:
+            LOG.exception(DefaultNetException)
+            return None
+        except TaskDistributionNetException:
+            LOG.exception(TaskDistributionNetException)
+            return None
+        except Exception:
+            LOG.exception(f'Boinc net creation error. \nCheck net params: {self.params.__dict__}')
+            return None
 
     @staticmethod
     def _make_prefix(task_id) -> str:

@@ -3,8 +3,12 @@ from typing import List, Union
 
 from petnetsim import PetriNet, Place, Transition, Arc, TransitionStochastic, TransitionTimed
 
-from fah.nets.default_net import DefaultNet
+from fah.nets.default_net import DefaultNet, DefaultNetException
 from fah.utils.constants import Constants
+
+
+class TaskDistributionNetException(Exception):
+    pass
 
 
 @dataclass
@@ -20,20 +24,20 @@ class TaskDistributionNet(DefaultNet):
 
     # cloning clients
     def _clone_clients(self) -> None:
-        for client_i in range(1, self.params.clients + 1):
+        for client_i in range(self.params.clients):
             # filling probability and time data to transitions
             for tr in self.client_net.transitions:
                 if isinstance(tr, TransitionTimed):
                     tr_to_params_mapping: Union[tuple[list], tuple[list, list]] = self._get_mapping(
                         tr_name=tr.name)
-                    tr.t_min = tr_to_params_mapping[0][client_i - 1]
-                    tr.t_max = tr_to_params_mapping[1][client_i - 1]
+                    tr.t_min = tr_to_params_mapping[0][client_i]
+                    tr.t_max = tr_to_params_mapping[1][client_i]
                 elif isinstance(tr, TransitionStochastic):
                     tr_to_params_mapping: Union[tuple[list], tuple[list, list]] = self._get_mapping(
                         tr_name=tr.name)
-                    tr.probability = tr_to_params_mapping[0][client_i - 1]
+                    tr.probability = tr_to_params_mapping[0][client_i]
 
-            prefix: str = self._make_prefix(client_id=client_i)
+            prefix: str = self._make_prefix(client_id=client_i + 1)
 
             self.client_net.clone(prefix, self.places, self.transitions, self.arcs)
             self.arcs.append(Arc(source='distribution', target=f'{prefix}waiting'))
@@ -41,8 +45,14 @@ class TaskDistributionNet(DefaultNet):
             self.arcs.append(Arc(source=f'{prefix}merge', target='results_counter'))
 
     def make_net(self) -> PetriNet:
-        self._clone_clients()
-        return PetriNet(self.places, self.transitions, self.arcs)
+        try:
+            self._clone_clients()
+            return PetriNet(self.places, self.transitions, self.arcs)
+        except DefaultNetException:
+            raise
+        except Exception:
+            raise TaskDistributionNetException(f'Task distribution net creation error. \nCheck net params: '
+                                               f'{self.params.__dict__}')
 
     @staticmethod
     def _make_prefix(client_id: int) -> str:
