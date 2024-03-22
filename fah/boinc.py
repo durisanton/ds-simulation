@@ -142,6 +142,7 @@ class BoincSimulation:
         """
             gant plot of basic setup of nets
         """
+        self.params: Params = Params.init()
         fig: Figure = plt.figure(figsize=(20, 8))
         if not self.make_net():
             return fig
