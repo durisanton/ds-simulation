@@ -1,7 +1,7 @@
 import json
 
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import IntegerField, Model
+from django.db.models import IntegerField, Model, FloatField
 
 
 class Params(Model):
@@ -16,20 +16,20 @@ class Params(Model):
     connect_max_time = ArrayField(IntegerField(), default=list, blank=True)
     pc_initialization_min_time = ArrayField(IntegerField(), default=list, blank=True)
     pc_initialization_max_time = ArrayField(IntegerField(), default=list, blank=True)
-    client_running_probability = ArrayField(IntegerField(), default=list, blank=True)
-    client_crash_probability = ArrayField(IntegerField(), default=list, blank=True)
+    client_running_probability = ArrayField(FloatField(), default=list, blank=True)
+    client_crash_probability = ArrayField(FloatField(), default=list, blank=True)
     compute_1_min_time = ArrayField(IntegerField(), default=list, blank=True)
     compute_1_max_time = ArrayField(IntegerField(), default=list, blank=True)
-    pause_on_probability = ArrayField(IntegerField(), default=list, blank=True)
-    pause_off_probability = ArrayField(IntegerField(), default=list, blank=True)
+    pause_on_probability = ArrayField(FloatField(), default=list, blank=True)
+    pause_off_probability = ArrayField(FloatField(), default=list, blank=True)
     in_pause_min_time = ArrayField(IntegerField(), default=list, blank=True)
     in_pause_max_time = ArrayField(IntegerField(), default=list, blank=True)
-    job_running_probability = ArrayField(IntegerField(), default=list, blank=True)
-    job_crash_probability = ArrayField(IntegerField(), default=list, blank=True)
+    job_running_probability = ArrayField(FloatField(), default=list, blank=True)
+    job_crash_probability = ArrayField(FloatField(), default=list, blank=True)
     compute_2_min_time = ArrayField(IntegerField(), default=list, blank=True)
     compute_2_max_time = ArrayField(IntegerField(), default=list, blank=True)
-    correct_probability = ArrayField(IntegerField(), default=list, blank=True)
-    incorrect_probability = ArrayField(IntegerField(), default=list, blank=True)
+    correct_probability = ArrayField(FloatField(), default=list, blank=True)
+    incorrect_probability = ArrayField(FloatField(), default=list, blank=True)
 
     def update(self, **kwargs):
         for name, values in kwargs.items():

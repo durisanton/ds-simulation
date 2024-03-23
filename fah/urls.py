@@ -1,17 +1,14 @@
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 
-from fah.views.deadline import Deadline
-from fah.views.gant import Gant
-from fah.views.params import Params
-from fah.views.pause_deadline import PauseDeadline
-from fah.views.stats import Stats
+from fah.views import plot_stats, plot_deadline, plot_pause_deadline, plot_gant, params, change_params
 
 urlpatterns = [
-    path("deadline", Deadline.as_view(), name="deadline"),
-    path("deadline/stats", Stats.as_view(), name="deadline stats"),
-    path("pause-deadline", PauseDeadline.as_view(), name="pause deadline"),
-    path("pause-deadline/stats", Stats.as_view(), name="pause deadline stats"),
-    path("gant", Gant.as_view(), name="gant"),
-    path("params", Params.as_view(), name="params"),
-    path("change-params", Params.as_view(), name="change params")
+    path("deadline", plot_stats, name="deadline"),
+    path("deadline/stats", plot_deadline, name="deadline stats"),
+    path("pause-deadline", plot_pause_deadline, name="pause deadline"),
+    path("pause-deadline/stats", plot_stats, name="pause deadline stats"),
+    path("gant", plot_gant, name="gant"),
+    path("params", params, name="params"),
+    path("change-params", csrf_exempt(change_params), name="change params")
 ]
